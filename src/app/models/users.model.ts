@@ -1,8 +1,9 @@
 import { model } from "mongoose";
 
 import { Schema } from "mongoose";
+import { IUser } from "../interfaces/user.interface";
 
-export const userSchema = new Schema({
+export const userSchema = new Schema <IUser>({
   name: { type: String, required: true, trim: true },
   email: {
     type: String,
@@ -35,4 +36,4 @@ export const userSchema = new Schema({
 });
 
 
-export const User= model("User", userSchema)
+export const User= model <IUser>("User", userSchema)
