@@ -4,34 +4,67 @@ exports.User = exports.userSchema = void 0;
 const mongoose_1 = require("mongoose");
 const mongoose_2 = require("mongoose");
 exports.userSchema = new mongoose_2.Schema({
-    name: { type: String, required: true, trim: true },
-    email: {
+    name: {
         type: String,
         required: true,
-        unique: true,
+        trim: true,
+        maxlength: [15, "Name have not 15 characters longer. got {VALUE} "],
+        minlength: [3, "Name have not 3 characters shorter. got {VALUE} "],
+    },
+    email: {
+        type: String,
+        required: [true, "Invalid type email!"],
+        unique: [true, "this email already exist."],
         trim: true,
         index: true,
+        lowercase: true,
+        match: [
+            /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+            "Please type valid email address.",
+        ],
     },
-    gender: { type: String, enum: ["Male", "Female", "Custom"], required: true },
+    gender: {
+        type: String,
+        enum: ["MALE", "FEMALE", "CUSTOM"],
+        uppercase: true,
+        required: true,
+    },
     address: {
         country: {
             type: String,
-            enum: ["Bangladesh", "US", "India"],
+            enum: ["Bangladesh", "US", "India", "Others"],
             default: "Bangladesh",
         },
-        city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur"] },
+        city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
     },
     friends: [
         {
-            name: { type: String, required: true },
-            email: { type: String, required: true },
+            name: { type: String },
+            email: {
+                type: String,
+                trim: true,
+                lowercase: true,
+                match: [
+                    /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+                    "Please type valid email address.",
+                ],
+            },
         },
     ],
-    age: { type: Number, max: 80, min: 18, required: true },
+    age: {
+        type: Number,
+        max: [60, "Age must be less then 60. got {VALUE}"],
+        min: [18, "Age must be gater then 18. got {VALUE}"],
+        required: true,
+    },
     skills: [{ type: String, default: "" }],
     isActive: { type: Boolean, default: false },
+    phone: {
+        type: String,
+        match: [/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"],
+    },
 }, {
     versionKey: false,
-    timestamps: true
+    timestamps: true,
 });
 exports.User = (0, mongoose_1.model)("User", exports.userSchema);

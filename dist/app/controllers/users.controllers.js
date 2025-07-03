@@ -22,22 +22,8 @@ exports.userRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, func
 }));
 exports.userRoutes.post("/create-user", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.body;
-    // const newUser = new User({
-    //   address:{
-    //     country:"Bangladesh",
-    //     city:"Rangpur"
-    //   },
-    //   age:23,
-    //   email: "sushantos@gmail.com",
-    //   friends:[{name:'sushanto',
-    //     email: "hello@gmail.com"
-    //   }],
-    //   gender:"Male",
-    //   name:"Sushanto"
-    // })
-    // newUser.save()
     const newUser = yield users_model_1.User.create(user);
-    res.json(newUser);
+    res.status(201).json(newUser);
 }));
 exports.userRoutes.patch("/update-user/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;

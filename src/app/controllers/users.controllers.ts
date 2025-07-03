@@ -10,23 +10,9 @@ userRoutes.get("/", async (req: Request, res: Response) => {
 
 userRoutes.post("/create-user", async (req: Request, res: Response) => {
   const user = req.body;
-  // const newUser = new User({
-  //   address:{
-  //     country:"Bangladesh",
-  //     city:"Rangpur"
-  //   },
-  //   age:23,
-  //   email: "sushantos@gmail.com",
-  //   friends:[{name:'sushanto',
-  //     email: "hello@gmail.com"
-  //   }],
-  //   gender:"Male",
-  //   name:"Sushanto"
-  // })
 
-  // newUser.save()
   const newUser = await User.create(user);
-  res.json(newUser);
+  res.status(201).json(newUser);
 });
 
 userRoutes.patch("/update-user/:id", async (req: Request, res: Response) => {

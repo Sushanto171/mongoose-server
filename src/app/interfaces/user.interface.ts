@@ -1,11 +1,11 @@
 export interface IUser {
   name: string;
   email: string;
-  gender: "Male" | "Female" | "Custom";
+  gender: "MALE" | "FEMALE" | "CUSTOM";
   age: number;
   address: {
-    country: "Bangladesh" | "US" | "India";
-    city: "Dhaka" | "Shylet" | "Rangpur";
+    country: "Bangladesh" | "US" | "India"| "Others";
+    city: "Dhaka" | "Shylet" | "Rangpur" | "Others";
   };
   friends: 
     {
@@ -13,7 +13,8 @@ export interface IUser {
       email: string
     }[],
   skills: string[],
-  isActive: boolean
+  isActive: boolean,
+  phone?: string
 }
 
 

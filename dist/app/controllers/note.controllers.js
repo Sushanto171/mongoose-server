@@ -24,12 +24,17 @@ exports.noteRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, func
     });
 }));
 exports.noteRoutes.post("/create-note", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    const note = yield notes_model_1.Note.create(body);
-    res.status(201).json({
-        message: "Successfully created a note!",
-        note
-    });
+    try {
+        const body = req.body;
+        const note = yield notes_model_1.Note.create(body);
+        res.status(201).json({
+            message: "Successfully created a note!",
+            note
+        });
+    }
+    catch (err) {
+        throw err;
+    }
 }));
 exports.noteRoutes.patch("/update-note/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const noteId = req.params.id;

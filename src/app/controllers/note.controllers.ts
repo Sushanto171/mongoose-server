@@ -11,12 +11,17 @@ noteRoutes.get("/", async(req:Request,res: Response)=>{
 })
 
 noteRoutes.post("/create-note", async(req:Request,res: Response)=>{
-  const body = req.body;
-  const note = await Note.create(body)
-  res.status(201).json({
-    message: "Successfully created a note!",
-    note
-  })
+  try{
+
+    const body = req.body;
+    const note = await Note.create(body)
+    res.status(201).json({
+      message: "Successfully created a note!",
+      note
+    })
+  }catch(err){
+    throw err;
+  }
 })
 
 noteRoutes.patch("/update-note/:id", async(req:Request,res: Response)=>{
