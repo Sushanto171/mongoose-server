@@ -24,7 +24,9 @@ exports.userRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.userRoutes.post("/create-user", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_zod_interface_1.createUserZodSchema.parseAsync(req.body);
-        const newUser = yield users_model_1.User.create(user);
+        const newUser = new users_model_1.User(user);
+        yield newUser.hashPassword(user.password);
+        yield newUser.save();
         res.status(201).json(newUser);
     }
     catch (error) {

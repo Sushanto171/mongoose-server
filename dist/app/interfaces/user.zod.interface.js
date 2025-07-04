@@ -22,4 +22,5 @@ exports.createUserZodSchema = zod_1.default.object({
     isActive: zod_1.default.boolean().default(false).optional(),
     phone: zod_1.default.string().regex(/^(\+8801|01)[0-9]{9}$/, "Invalid phone number"),
     role: zod_1.default.enum(["ADMIN", "USER", "SUPER-ADMIN"]).default("USER").optional(),
+    password: zod_1.default.string()
 });

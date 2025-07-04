@@ -1,7 +1,7 @@
-import { model, Schema } from "mongoose";
-import { INote } from "../interfaces/notes.interface";
+import { Model, model, Schema } from "mongoose";
+import { INote, NoteMethod } from "../interfaces/notes.interface";
 
-const noteSchema = new Schema<INote>(
+const noteSchema = new Schema<INote, Model<INote>, NoteMethod>(
   {
     title: {
       type: String,
@@ -24,4 +24,8 @@ const noteSchema = new Schema<INote>(
   }
 );
 
-export const Note = model<INote>("Note", noteSchema);
+
+noteSchema.methods.showTitle = function (title: string) {
+  console.log({ title });
+};
+export const Note = model("Note", noteSchema);

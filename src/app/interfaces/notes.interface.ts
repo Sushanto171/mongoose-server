@@ -8,3 +8,8 @@ export interface INote {
   category: ("Frontend" | "Backend" | "Fullstack" | "Others")[];
   user: Types.ObjectId;
 }
+
+
+export interface NoteMethod {
+  showTitle(title:string): void
+}

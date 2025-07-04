@@ -18,7 +18,7 @@ const note_zod_interface_1 = require("../interfaces/note.zod.interface");
 const notes_model_1 = require("../models/notes.model");
 exports.noteRoutes = express_1.default.Router();
 exports.noteRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const notes = yield notes_model_1.Note.find().populate('user');
+    const notes = yield notes_model_1.Note.find().populate("user");
     res.status(200).json({
         message: "Successfully fetched all notes",
         notes,
@@ -27,7 +27,9 @@ exports.noteRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.noteRoutes.post("/create-note", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = yield note_zod_interface_1.createNoteZodSchema.parseAsync(req.body);
-        const note = yield notes_model_1.Note.create(body);
+        // const note = await Note.create(body);
+        const note = new notes_model_1.Note(body);
+        note.showTitle(body.title);
         res.status(201).json({
             message: "Successfully created a note!",
             note,

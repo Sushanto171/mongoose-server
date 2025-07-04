@@ -19,6 +19,7 @@ import z from "zod";
   isActive: z.boolean().default(false).optional(),
   phone: z.string().regex(/^(\+8801|01)[0-9]{9}$/, "Invalid phone number"),
   role: z.enum(["ADMIN", "USER", "SUPER-ADMIN"]).default("USER").optional(),
+  password: z.string()
 });
 
 export type CreateUserInput = z.infer<typeof createUserZodSchema>;

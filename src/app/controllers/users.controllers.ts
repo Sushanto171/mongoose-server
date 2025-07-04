@@ -17,8 +17,10 @@ userRoutes.post("/create-user", async (req: Request, res: Response) => {
     const user: CreateUserInput = await createUserZodSchema.parseAsync(
       req.body
     );
+    const newUser = new User(user);
+    await newUser.hashPassword(user.password);
+    await newUser.save();
 
-    const newUser = await User.create(user);
     res.status(201).json(newUser);
   } catch (error) {
     // next(error)

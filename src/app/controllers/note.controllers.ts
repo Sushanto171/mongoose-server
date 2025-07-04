@@ -7,7 +7,8 @@ import { Note } from "../models/notes.model";
 export const noteRoutes = express.Router();
 
 noteRoutes.get("/", async (req: Request, res: Response) => {
-  const notes = await Note.find().populate('user');
+  const notes = await Note.find().populate("user");
+  
   res.status(200).json({
     message: "Successfully fetched all notes",
     notes,
@@ -17,7 +18,9 @@ noteRoutes.get("/", async (req: Request, res: Response) => {
 noteRoutes.post("/create-note", async (req: Request, res: Response) => {
   try {
     const body: CreateNoteType = await createNoteZodSchema.parseAsync(req.body);
-    const note = await Note.create(body);
+    // const note = await Note.create(body);
+    const note = new Note(body)
+    note.showTitle(body.title)
     res.status(201).json({
       message: "Successfully created a note!",
       note,

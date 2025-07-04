@@ -21,4 +21,7 @@ const noteSchema = new mongoose_1.Schema({
     versionKey: false,
     timestamps: true,
 });
+noteSchema.methods.showTitle = function (title) {
+    console.log({ title });
+};
 exports.Note = (0, mongoose_1.model)("Note", noteSchema);

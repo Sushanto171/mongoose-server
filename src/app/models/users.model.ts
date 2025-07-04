@@ -1,34 +1,40 @@
-import { model } from "mongoose";
+import { Model, model } from "mongoose";
 
+import bcrypt from "bcryptjs";
 import { Schema } from "mongoose";
 import validator from "validator";
-import { IUser } from "../interfaces/user.interface";
-
-const addressSchema = new Schema({
-  country: {
-    type: String,
-    enum: ["Bangladesh", "US", "India", "Others"],
-    default: "Bangladesh",
+import { IUser, UserMethod } from "../interfaces/user.interface";
+const addressSchema = new Schema(
+  {
+    country: {
+      type: String,
+      enum: ["Bangladesh", "US", "India", "Others"],
+      default: "Bangladesh",
+    },
+    city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
   },
-  city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
-}, {_id:false});
+  { _id: false }
+);
 
-const friendSchema = new Schema({
-  name: { type: String },
-  email: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    match: [
-      /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-      "Please type valid email address.",
-    ],
+const friendSchema = new Schema(
+  {
+    name: { type: String },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+        "Please type valid email address.",
+      ],
+    },
   },
-},{
-  _id: false
-});
+  {
+    _id: false,
+  }
+);
 
-export const userSchema = new Schema<IUser>(
+export const userSchema = new Schema<IUser, Model<IUser>, UserMethod>(
   {
     name: {
       type: String,
@@ -37,6 +43,7 @@ export const userSchema = new Schema<IUser>(
       maxlength: [15, "Name have not 15 characters longer. got {VALUE} "],
       minlength: [3, "Name have not 3 characters shorter. got {VALUE} "],
     },
+    password: { type: String, required: true },
     email: {
       type: String,
       required: [true, "Invalid type email!"],
@@ -98,4 +105,17 @@ export const userSchema = new Schema<IUser>(
   }
 );
 
-export const User = model<IUser>("User", userSchema);
+userSchema.methods.updateName = function (name) {
+  this.name = name;
+  return this.save();
+};
+
+userSchema.method(
+  "hashPassword",
+  async function hashPassword(password: string) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    this.password = hashedPassword;
+    return hashedPassword
+  }
+);
+export const User = model<IUser, Model<IUser,{},UserMethod>>("User", userSchema);
