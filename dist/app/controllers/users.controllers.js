@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRoutes = void 0;
 const express_1 = __importDefault(require("express"));
+const user_zod_interface_1 = require("../interfaces/user.zod.interface");
 const users_model_1 = require("../models/users.model");
 exports.userRoutes = express_1.default.Router();
 exports.userRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -21,9 +22,16 @@ exports.userRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, func
     res.json(users);
 }));
 exports.userRoutes.post("/create-user", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = req.body;
-    const newUser = yield users_model_1.User.create(user);
-    res.status(201).json(newUser);
+    try {
+        const user = yield user_zod_interface_1.createUserZodSchema.parseAsync(req.body);
+        const newUser = yield users_model_1.User.create(user);
+        res.status(201).json(newUser);
+    }
+    catch (error) {
+        // next(error)
+        // console.log("❌❌❌", error);
+        throw error;
+    }
 }));
 exports.userRoutes.patch("/update-user/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;

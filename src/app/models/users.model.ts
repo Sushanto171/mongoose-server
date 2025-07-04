@@ -1,7 +1,32 @@
 import { model } from "mongoose";
 
 import { Schema } from "mongoose";
+import validator from "validator";
 import { IUser } from "../interfaces/user.interface";
+
+const addressSchema = new Schema({
+  country: {
+    type: String,
+    enum: ["Bangladesh", "US", "India", "Others"],
+    default: "Bangladesh",
+  },
+  city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
+}, {_id:false});
+
+const friendSchema = new Schema({
+  name: { type: String },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    match: [
+      /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+      "Please type valid email address.",
+    ],
+  },
+},{
+  _id: false
+});
 
 export const userSchema = new Schema<IUser>(
   {
@@ -19,10 +44,21 @@ export const userSchema = new Schema<IUser>(
       trim: true,
       index: true,
       lowercase: true,
-      match: [
-        /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-        "Please type valid email address.",
-      ],
+      // approach 1
+      validate: [validator.isEmail, "Invalid type {VALUE} email"],
+      // approach 2
+      // validate: {
+      //   validator:function(value){
+      //     return  /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(value)
+      //   },
+      //   message: (props)=> `Invalid ${props.value} email address.`
+      // }
+
+      // approach 3
+      // match: [
+      //   /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+      //   "Please type valid email address.",
+      // ],
     },
     gender: {
       type: String,
@@ -31,27 +67,9 @@ export const userSchema = new Schema<IUser>(
       required: true,
     },
     address: {
-      country: {
-        type: String,
-        enum: ["Bangladesh", "US", "India", "Others"],
-        default: "Bangladesh",
-      },
-      city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
+      type: addressSchema,
     },
-    friends: [
-      {
-        name: { type: String },
-        email: {
-          type: String,
-          trim: true,
-          lowercase: true,
-          match: [
-            /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-            "Please type valid email address.",
-          ],
-        },
-      },
-    ],
+    friends: [{ type: friendSchema }],
     age: {
       type: Number,
       max: [60, "Age must be less then 60. got {VALUE}"],
@@ -63,6 +81,15 @@ export const userSchema = new Schema<IUser>(
     phone: {
       type: String,
       match: [/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"],
+    },
+    role: {
+      type: String,
+      enum: {
+        values: ["ADMIN", "USER", "SUPER-ADMIN"],
+        message: "Invalid role '{VALUE}'",
+      },
+      default: "ADMIN",
+      uppercase: true,
     },
   },
   {

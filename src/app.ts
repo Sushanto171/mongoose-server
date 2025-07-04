@@ -21,7 +21,7 @@ app.use((req:Request, res:Response, next:NextFunction)=>{
 
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-    res.status(err.status || 500).json({message: err.message});
+    res.status(err.status || 500).json({message: err.message, err});
   }
 );
 

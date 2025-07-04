@@ -14,22 +14,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.noteRoutes = void 0;
 const express_1 = __importDefault(require("express"));
+const note_zod_interface_1 = require("../interfaces/note.zod.interface");
 const notes_model_1 = require("../models/notes.model");
 exports.noteRoutes = express_1.default.Router();
 exports.noteRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const notes = yield notes_model_1.Note.find();
+    const notes = yield notes_model_1.Note.find().populate('user');
     res.status(200).json({
         message: "Successfully fetched all notes",
-        notes
+        notes,
     });
 }));
 exports.noteRoutes.post("/create-note", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const body = req.body;
+        const body = yield note_zod_interface_1.createNoteZodSchema.parseAsync(req.body);
         const note = yield notes_model_1.Note.create(body);
         res.status(201).json({
             message: "Successfully created a note!",
-            note
+            note,
         });
     }
     catch (err) {
@@ -42,7 +43,7 @@ exports.noteRoutes.patch("/update-note/:id", (req, res) => __awaiter(void 0, voi
     const note = yield notes_model_1.Note.findByIdAndUpdate(noteId, body, { new: true });
     res.status(200).json({
         message: "Successfully updated",
-        note
+        note,
     });
 }));
 exports.noteRoutes.delete("/delete-note/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,14 +51,14 @@ exports.noteRoutes.delete("/delete-note/:id", (req, res) => __awaiter(void 0, vo
     const note = yield notes_model_1.Note.findByIdAndDelete(noteId);
     res.status(200).json({
         message: "Successfully deleted an note",
-        note
+        note,
     });
 }));
 exports.noteRoutes.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const noteId = req.params.id;
-    const note = yield notes_model_1.Note.findById(noteId);
+    const note = yield notes_model_1.Note.findById(noteId).populate("user");
     res.status(200).json({
         message: "Successfully fetched a note",
-        note
+        note,
     });
 }));

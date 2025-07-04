@@ -1,4 +1,8 @@
 import express, { Request, Response } from "express";
+import {
+  CreateUserInput,
+  createUserZodSchema,
+} from "../interfaces/user.zod.interface";
 import { User } from "../models/users.model";
 
 export const userRoutes = express.Router();
@@ -9,10 +13,18 @@ userRoutes.get("/", async (req: Request, res: Response) => {
 });
 
 userRoutes.post("/create-user", async (req: Request, res: Response) => {
-  const user = req.body;
+  try {
+    const user: CreateUserInput = await createUserZodSchema.parseAsync(
+      req.body
+    );
 
-  const newUser = await User.create(user);
-  res.status(201).json(newUser);
+    const newUser = await User.create(user);
+    res.status(201).json(newUser);
+  } catch (error) {
+    // next(error)
+    // console.log("❌❌❌", error);
+    throw error;
+  }
 });
 
 userRoutes.patch("/update-user/:id", async (req: Request, res: Response) => {
@@ -22,14 +34,14 @@ userRoutes.patch("/update-user/:id", async (req: Request, res: Response) => {
   res.json({ message: "User updated successfully!", user });
 });
 
-userRoutes.delete("/delete-user/:id",async(req:Request,res:Response)=>{
+userRoutes.delete("/delete-user/:id", async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const user = await User.findByIdAndDelete(userId)
-   res.json({message: "Successfully deleted the user.", user})
-})
+  const user = await User.findByIdAndDelete(userId);
+  res.json({ message: "Successfully deleted the user.", user });
+});
 
-userRoutes.get("/:id",async(req:Request,res:Response)=>{
+userRoutes.get("/:id", async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const user = await User.findById(userId)
-   res.json({message: "User fetched successfully!", user})
-})
+  const user = await User.findById(userId);
+  res.json({ message: "User fetched successfully!", user });
+});

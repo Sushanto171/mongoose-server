@@ -1,8 +1,34 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = exports.userSchema = void 0;
 const mongoose_1 = require("mongoose");
 const mongoose_2 = require("mongoose");
+const validator_1 = __importDefault(require("validator"));
+const addressSchema = new mongoose_2.Schema({
+    country: {
+        type: String,
+        enum: ["Bangladesh", "US", "India", "Others"],
+        default: "Bangladesh",
+    },
+    city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
+}, { _id: false });
+const friendSchema = new mongoose_2.Schema({
+    name: { type: String },
+    email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        match: [
+            /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+            "Please type valid email address.",
+        ],
+    },
+}, {
+    _id: false
+});
 exports.userSchema = new mongoose_2.Schema({
     name: {
         type: String,
@@ -18,10 +44,20 @@ exports.userSchema = new mongoose_2.Schema({
         trim: true,
         index: true,
         lowercase: true,
-        match: [
-            /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-            "Please type valid email address.",
-        ],
+        // approach 1
+        validate: [validator_1.default.isEmail, "Invalid type {VALUE} email"],
+        // approach 2
+        // validate: {
+        //   validator:function(value){
+        //     return  /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(value)
+        //   },
+        //   message: (props)=> `Invalid ${props.value} email address.`
+        // }
+        // approach 3
+        // match: [
+        //   /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+        //   "Please type valid email address.",
+        // ],
     },
     gender: {
         type: String,
@@ -30,27 +66,9 @@ exports.userSchema = new mongoose_2.Schema({
         required: true,
     },
     address: {
-        country: {
-            type: String,
-            enum: ["Bangladesh", "US", "India", "Others"],
-            default: "Bangladesh",
-        },
-        city: { type: String, enum: ["Dhaka", "Shylet", "Rangpur", "Others"] },
+        type: addressSchema,
     },
-    friends: [
-        {
-            name: { type: String },
-            email: {
-                type: String,
-                trim: true,
-                lowercase: true,
-                match: [
-                    /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-                    "Please type valid email address.",
-                ],
-            },
-        },
-    ],
+    friends: [{ type: friendSchema }],
     age: {
         type: Number,
         max: [60, "Age must be less then 60. got {VALUE}"],
@@ -62,6 +80,15 @@ exports.userSchema = new mongoose_2.Schema({
     phone: {
         type: String,
         match: [/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"],
+    },
+    role: {
+        type: String,
+        enum: {
+            values: ["ADMIN", "USER", "SUPER-ADMIN"],
+            message: "Invalid role '{VALUE}'",
+        },
+        default: "ADMIN",
+        uppercase: true,
     },
 }, {
     versionKey: false,

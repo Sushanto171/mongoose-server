@@ -19,6 +19,6 @@ app.use((req, res, next) => {
     res.status(404).json({ message: `'${pathname}' this route is not found!` });
 });
 app.use((err, req, res, next) => {
-    res.status(err.status || 500).json({ message: err.message });
+    res.status(err.status || 500).json({ message: err.message, err });
 });
 exports.default = app;

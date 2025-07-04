@@ -14,7 +14,8 @@ export interface IUser {
     }[],
   skills: string[],
   isActive: boolean,
-  phone?: string
+  phone?: string,
+  role: "ADMIN" | "USER" | "SUPER-ADMIN"
 }
 
 
