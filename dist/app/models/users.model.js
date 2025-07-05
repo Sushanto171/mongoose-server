@@ -116,4 +116,27 @@ exports.userSchema.method("hashPassword", function hashPassword(password) {
         return hashedPassword;
     });
 });
+exports.userSchema.static("findByEmail", function findByEmail(email) {
+    return this.findOne({ email });
+});
+exports.userSchema.static('hashPassword', function hashPassword(password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const hash = yield bcryptjs_1.default.hash(password, 10);
+        return hash;
+    });
+});
+// middleware
+// pre
+exports.userSchema.pre("save", function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // console.log("✅ Pre Middleware",this.password);
+        this.password = yield bcryptjs_1.default.hash(this.password, 10);
+        next();
+    });
+});
+// post
+exports.userSchema.post('save', function (res, next) {
+    console.log("%s ✅ Has successfully save", res.email);
+    return next();
+});
 exports.User = (0, mongoose_1.model)("User", exports.userSchema);

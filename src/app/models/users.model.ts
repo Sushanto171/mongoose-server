@@ -1,9 +1,13 @@
-import { Model, model } from "mongoose";
+import { model } from "mongoose";
 
 import bcrypt from "bcryptjs";
 import { Schema } from "mongoose";
 import validator from "validator";
-import { IUser, UserMethod } from "../interfaces/user.interface";
+import {
+  IUser,
+  UserInstanceMethod,
+  UserStaticMethod,
+} from "../interfaces/user.interface";
 const addressSchema = new Schema(
   {
     country: {
@@ -34,7 +38,11 @@ const friendSchema = new Schema(
   }
 );
 
-export const userSchema = new Schema<IUser, Model<IUser>, UserMethod>(
+export const userSchema = new Schema<
+  IUser,
+  UserStaticMethod,
+  UserInstanceMethod
+>(
   {
     name: {
       type: String,
@@ -115,7 +123,31 @@ userSchema.method(
   async function hashPassword(password: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
     this.password = hashedPassword;
-    return hashedPassword
+    return hashedPassword;
   }
 );
-export const User = model<IUser, Model<IUser,{},UserMethod>>("User", userSchema);
+
+userSchema.static("findByEmail", function findByEmail(email: string) {
+  return this.findOne({ email });
+});
+
+userSchema.static('hashPassword', async function hashPassword(password:string){
+  const hash =await bcrypt.hash(password, 10)
+  return hash
+})
+
+// middleware
+// pre
+userSchema.pre<IUser>("save",async function (next) {
+  // console.log("✅ Pre Middleware",this.password);
+  this.password = await bcrypt.hash(this.password, 10)
+  next();
+});
+
+// post
+userSchema.post<IUser>('save', function(res, next){
+  console.log( "%s ✅ Has successfully save", res.email);
+  return next()
+})
+
+export const User = model<IUser, UserStaticMethod>("User", userSchema);

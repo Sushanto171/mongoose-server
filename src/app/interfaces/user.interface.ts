@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { Document, Model, mongo } from "mongoose";
 
 export interface IUser {
   name: string;
@@ -20,7 +20,12 @@ export interface IUser {
   role: "ADMIN" | "USER" | "SUPER-ADMIN";
 }
 
-export interface UserMethod {
+export interface UserInstanceMethod  {
   updateName(name: string): Promise<any>;
   hashPassword(password: string):  string;
+}
+
+export interface UserStaticMethod extends Model<IUser, UserInstanceMethod>{
+  findByEmail(email:string):Promise<void>
+  hashPassword(password:string) :string
 }

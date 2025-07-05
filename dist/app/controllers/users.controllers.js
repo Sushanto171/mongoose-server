@@ -24,9 +24,8 @@ exports.userRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.userRoutes.post("/create-user", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_zod_interface_1.createUserZodSchema.parseAsync(req.body);
-        const newUser = new users_model_1.User(user);
-        yield newUser.hashPassword(user.password);
-        yield newUser.save();
+        // user.password = await User.hashPassword(user.password);
+        const newUser = yield users_model_1.User.create(user);
         res.status(201).json(newUser);
     }
     catch (error) {
@@ -49,5 +48,11 @@ exports.userRoutes.delete("/delete-user/:id", (req, res) => __awaiter(void 0, vo
 exports.userRoutes.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const user = yield users_model_1.User.findById(userId);
+    res.json({ message: "User fetched successfully!", user });
+}));
+exports.userRoutes.get("/find-by-email/:email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const email = req.params.email;
+    // built in and custom static method
+    const user = yield users_model_1.User.findByEmail(email);
     res.json({ message: "User fetched successfully!", user });
 }));
