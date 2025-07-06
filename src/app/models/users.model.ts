@@ -8,6 +8,7 @@ import {
   UserInstanceMethod,
   UserStaticMethod,
 } from "../interfaces/user.interface";
+import { Note } from "./notes.model";
 const addressSchema = new Schema(
   {
     country: {
@@ -110,6 +111,8 @@ export const userSchema = new Schema<
   {
     versionKey: false,
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
@@ -131,23 +134,40 @@ userSchema.static("findByEmail", function findByEmail(email: string) {
   return this.findOne({ email });
 });
 
-userSchema.static('hashPassword', async function hashPassword(password:string){
-  const hash =await bcrypt.hash(password, 10)
-  return hash
-})
+userSchema.static(
+  "hashPassword",
+  async function hashPassword(password: string) {
+    const hash = await bcrypt.hash(password, 10);
+    return hash;
+  }
+);
 
 // middleware
 // pre
-userSchema.pre<IUser>("save",async function (next) {
+userSchema.pre<IUser>("save", async function (next) {
   // console.log("✅ Pre Middleware",this.password);
-  this.password = await bcrypt.hash(this.password, 10)
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
 // post
-userSchema.post<IUser>('save', function(res, next){
-  console.log( "%s ✅ Has successfully save", res.email);
-  return next()
+userSchema.post<IUser>("save", function (res, next) {
+  console.log("%s ✅ Has successfully save", res.email);
+  return next();
+});
+
+// query post middleware
+userSchema.post("findOneAndDelete", async function (doc) {
+  // console.log(doc);
+  const result = await Note.deleteMany({ user: doc._id });
+  // console.log({result});
+});
+
+userSchema.virtual('firstName').get(function(){
+  return `${this.name.split(" ")[0]}`
+})
+userSchema.virtual('lastName').get(function(){
+  return `${this.name.split(" ")[1]}`
 })
 
 export const User = model<IUser, UserStaticMethod>("User", userSchema);

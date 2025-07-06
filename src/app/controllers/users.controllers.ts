@@ -31,7 +31,7 @@ userRoutes.patch("/update-user/:id", async (req: Request, res: Response) => {
 
 userRoutes.delete("/delete-user/:id", async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const user = await User.findByIdAndDelete(userId);
+  const user = await User.findOneAndDelete({_id: userId});
   res.json({ message: "Successfully deleted the user.", user });
 });
 
@@ -40,6 +40,7 @@ userRoutes.get("/:id", async (req: Request, res: Response) => {
   const user = await User.findById(userId);
   res.json({ message: "User fetched successfully!", user });
 });
+
 userRoutes.get("/find-by-email/:email", async (req: Request, res: Response) => {
   const email = req.params.email;
   // built in and custom static method

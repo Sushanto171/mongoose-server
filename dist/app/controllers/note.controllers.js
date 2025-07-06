@@ -18,18 +18,44 @@ const note_zod_interface_1 = require("../interfaces/note.zod.interface");
 const notes_model_1 = require("../models/notes.model");
 exports.noteRoutes = express_1.default.Router();
 exports.noteRoutes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const notes = yield notes_model_1.Note.find().populate("user");
-    res.status(200).json({
-        message: "Successfully fetched all notes",
-        notes,
-    });
+    try {
+        const notes = yield notes_model_1.Note.aggregate([
+            {
+                $lookup: {
+                    as: "user",
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                },
+            },
+            { $unwind: "$user" },
+            {
+                $project: {
+                    title: 1,
+                    body: 1,
+                    user: {
+                        name: 1,
+                        email: 1,
+                    },
+                },
+            },
+        ]);
+        res.status(200).json({
+            message: "Successfully fetched all notes",
+            notes,
+        });
+    }
+    catch (error) {
+        throw error;
+    }
 }));
 exports.noteRoutes.post("/create-note", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = yield note_zod_interface_1.createNoteZodSchema.parseAsync(req.body);
         // const note = await Note.create(body);
         const note = new notes_model_1.Note(body);
-        note.showTitle(body.title);
+        // note.showTitle(body.title)
+        yield note.save();
         res.status(201).json({
             message: "Successfully created a note!",
             note,

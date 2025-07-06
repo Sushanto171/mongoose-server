@@ -17,6 +17,7 @@ const mongoose_1 = require("mongoose");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const mongoose_2 = require("mongoose");
 const validator_1 = __importDefault(require("validator"));
+const notes_model_1 = require("./notes.model");
 const addressSchema = new mongoose_2.Schema({
     country: {
         type: String,
@@ -104,6 +105,8 @@ exports.userSchema = new mongoose_2.Schema({
 }, {
     versionKey: false,
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 exports.userSchema.methods.updateName = function (name) {
     this.name = name;
@@ -119,7 +122,7 @@ exports.userSchema.method("hashPassword", function hashPassword(password) {
 exports.userSchema.static("findByEmail", function findByEmail(email) {
     return this.findOne({ email });
 });
-exports.userSchema.static('hashPassword', function hashPassword(password) {
+exports.userSchema.static("hashPassword", function hashPassword(password) {
     return __awaiter(this, void 0, void 0, function* () {
         const hash = yield bcryptjs_1.default.hash(password, 10);
         return hash;
@@ -135,8 +138,22 @@ exports.userSchema.pre("save", function (next) {
     });
 });
 // post
-exports.userSchema.post('save', function (res, next) {
+exports.userSchema.post("save", function (res, next) {
     console.log("%s ✅ Has successfully save", res.email);
     return next();
+});
+// query post middleware
+exports.userSchema.post("findOneAndDelete", function (doc) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // console.log(doc);
+        const result = yield notes_model_1.Note.deleteMany({ user: doc._id });
+        // console.log({result});
+    });
+});
+exports.userSchema.virtual('firstName').get(function () {
+    return `${this.name.split(" ")[0]}`;
+});
+exports.userSchema.virtual('lastName').get(function () {
+    return `${this.name.split(" ")[1]}`;
 });
 exports.User = (0, mongoose_1.model)("User", exports.userSchema);

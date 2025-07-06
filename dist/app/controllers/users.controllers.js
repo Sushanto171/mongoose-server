@@ -42,7 +42,7 @@ exports.userRoutes.patch("/update-user/:id", (req, res) => __awaiter(void 0, voi
 }));
 exports.userRoutes.delete("/delete-user/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
-    const user = yield users_model_1.User.findByIdAndDelete(userId);
+    const user = yield users_model_1.User.findOneAndDelete({ _id: userId });
     res.json({ message: "Successfully deleted the user.", user });
 }));
 exports.userRoutes.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

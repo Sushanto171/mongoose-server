@@ -25,7 +25,7 @@ export interface UserInstanceMethod  {
   hashPassword(password: string):  string;
 }
 
-export interface UserStaticMethod extends Model<IUser, UserInstanceMethod>{
+export interface UserStaticMethod extends Model<IUser,{}, UserInstanceMethod>{
   findByEmail(email:string):Promise<void>
   hashPassword(password:string) :string
 }
